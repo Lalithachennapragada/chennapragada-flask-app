@@ -1,0 +1,13 @@
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app', '.']
+
+  # Step 2: Push the image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app']
+
+  # Step 3: Deploy the new container to Compute Engine
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['compute', 'ssh', 'chennapragada-flask', '--zone=us-central1-a', '--command', 
+           'docker pull gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app && docker stop $(docker ps -q) && docker run -d -p 5000:5000 gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app']
