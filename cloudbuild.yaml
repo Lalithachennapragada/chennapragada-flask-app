@@ -4,11 +4,17 @@ options:
 steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA', '.']
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA'
+      - '.'
 
   # Step 2: Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA']
+    args:
+      - 'push'
+      - 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA'
 
   # Step 3: Deploy the Docker image to the Compute Engine instance
   - name: 'gcr.io/cloud-builders/gcloud'
