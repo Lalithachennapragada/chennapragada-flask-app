@@ -10,7 +10,7 @@ steps:
       - |
         gcloud compute instances add-metadata chennapragada-flask \
           --zone=us-central1-a \
-          --metadata=gce-container-declaration="spec:\n  containers:\n  - name: chennapragada-flask\n    image: gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA\n  restartPolicy: Always"
+          --metadata=gce-container-declaration="spec:\n  containers:\n  - name: chennapragada-flask\n    image: \"gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA\"\n  restartPolicy: Always"
 
   # Step 2: Build the Docker image.
   - name: 'gcr.io/cloud-builders/docker'
