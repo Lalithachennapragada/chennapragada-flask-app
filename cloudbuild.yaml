@@ -1,24 +1,29 @@
 steps:
-  # Authenticate Docker with GCR
+  # Authenticate Docker with GCR using the specified service account
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['auth', 'configure-docker', 'gcr.io']
+    serviceAccount: 'cloudbuild-sa-chennapragada@supple-gearbox-447219-d0.iam.gserviceaccount.com'
 
   # SSH into the VM and pull the latest Docker image
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['compute', 'ssh', 'chennapragada-flask', '--zone=us-central1-a', '--command',
-           'gcloud auth configure-docker gcr.io && docker pull gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app']
+           'docker pull gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app']
+    serviceAccount: 'cloudbuild-sa-chennapragada@supple-gearbox-447219-d0.iam.gserviceaccount.com'
 
-  # Stop the existing container and run a new one
+  # Stop the existing container (if any) and run a new one
   - name: 'gcr.io/cloud-builders/gcloud'
     args: ['compute', 'ssh', 'chennapragada-flask', '--zone=us-central1-a', '--command',
            'docker stop $(docker ps -q) || true && docker run -d -p 5000:5000 gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app']
+    serviceAccount: 'cloudbuild-sa-chennapragada@supple-gearbox-447219-d0.iam.gserviceaccount.com'
 
   # OPTIONAL: Build and push a new Docker image (only if needed)
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/chennapragada-flask-app', '.']
+    serviceAccount: 'cloudbuild-sa-chennapragada@supple-gearbox-447219-d0.iam.gserviceaccount.com'
 
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/chennapragada-flask-app']
+    serviceAccount: 'cloudbuild-sa-chennapragada@supple-gearbox-447219-d0.iam.gserviceaccount.com'
 
 options:
   logging: CLOUD_LOGGING_ONLY
