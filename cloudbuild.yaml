@@ -7,14 +7,14 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA'
+      - 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:latest'
       - '.'
 
   # Step 2: Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA'
+      - 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:latest'
 
   # Step 3: Deploy the Docker image to the Compute Engine instance
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -24,7 +24,7 @@ steps:
       - 'update-container'
       - 'chennapragada-flask'  # Corrected instance name
       - '--zone=us-central1-a'
-      - '--container-image=gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA'
+      - '--container-image=gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:latest'
 
 substitutions:
   _COMMIT_SHA: "${SHORT_SHA}"
