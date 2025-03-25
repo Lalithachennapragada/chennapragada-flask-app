@@ -1,20 +1,22 @@
 options:
-  logging: CLOUD_LOGGING_ONLY
-  default_logs_bucket_behavior: REGIONAL_USER_OWNED_BUCKET
+  logging: CLOUD_LOGGING_ONLY  # Keeps logs only in Cloud Logging, not in a bucket
 
 steps:
+  # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA', '.']
 
+  # Step 2: Push the Docker image to Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA']
 
+  # Step 3: Deploy the Docker image to the Compute Engine instance
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'compute'
       - 'instances'
       - 'update-container'
-      - 'chennapragada-flask-instance'
+      - 'chennapragada-flask'  # Corrected instance name
       - '--zone=us-central1-a'
       - '--container-image=gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA'
 
