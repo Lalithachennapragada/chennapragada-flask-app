@@ -1,22 +1,39 @@
 options:
-  logging: CLOUD_LOGGING_ONLY  # Keeps logs only in Cloud Logging, not in a bucket
+  logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # Step 1: Build the Docker image
+  # Step 1: Set container declaration metadata on the instance.
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+        gcloud compute instances add-metadata chennapragada-flask \
+          --zone=us-central1-a \
+          --metadata=gce-container-declaration="$(cat <<'EOF'
+          spec:
+            containers:
+            - name: chennapragada-flask
+              image: gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA
+            restartPolicy: Always
+EOF
+          )"
+
+  # Step 2: Build the Docker image.
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA', '.']
 
-  # Step 2: Push the Docker image to Artifact Registry
+  # Step 3: Push the Docker image.
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA']
 
-  # Step 3: Deploy the Docker image to the Compute Engine instance
+  # Step 4: Update the container on the instance.
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'compute'
       - 'instances'
       - 'update-container'
-      - 'chennapragada-flask'  # Corrected instance name
+      - 'chennapragada-flask'
       - '--zone=us-central1-a'
       - '--container-image=gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:$COMMIT_SHA'
 
