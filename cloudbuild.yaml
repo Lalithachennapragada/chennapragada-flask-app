@@ -2,29 +2,28 @@ options:
   logging: CLOUD_LOGGING_ONLY  # Keeps logs only in Cloud Logging, not in a bucket
 
 steps:
-  # Step 1: Build the Docker image
+  # Step 1: Pull the latest image from Docker Hub or Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     args:
-      - 'build'
-      - '-t'
+      - 'pull'
       - 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:latest'
-      - '.'
 
-  # Step 2: Push the Docker image to Artifact Registry
+  # Step 2: Push the Docker image again (forces an update in GCP)
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
       - 'gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:latest'
 
-  # Step 3: Deploy the Docker image to the Compute Engine instance
+  # Step 3: Update the running container in GCP Compute Engine
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'compute'
       - 'instances'
       - 'update-container'
-      - 'chennapragada-flask'  # Corrected instance name
+      - 'chennapragada-flask'  # Instance name
       - '--zone=us-central1-a'
       - '--container-image=gcr.io/supple-gearbox-447219-d0/chennapragada-flask-app:latest'
+      - '--clear-container-metadata'  # Ensures old metadata is removed
 
 substitutions:
   _COMMIT_SHA: "${SHORT_SHA}"
